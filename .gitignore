@@ -216,3 +216,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Raw dataset — large and not ours to redistribute
+data/raw/
+
+# MLflow local state
+mlruns/
+mlartifacts/
