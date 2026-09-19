@@ -223,3 +223,6 @@ data/raw/
 # MLflow local state
 mlruns/
 mlartifacts/
+
+# MLflow local metadata store
+mlflow.db
