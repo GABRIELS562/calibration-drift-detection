@@ -1,0 +1,67 @@
+name: drift-check
+
+# Runs the drift check for one production batch. If any sensor is rejected
+# under the Westgard rules (ADR-0003) a candidate model is trained and
+# registered as pending-approval. Promotion is a separate, gated workflow:
+# nothing here can deploy a model.
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch:
+        description: Production batch to evaluate (2-10)
+        required: true
+        default: "7"
+  schedule:
+    - cron: "0 6 * * 1"  # Mondays 06:00 UTC — the "new run arrived" simulation
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      candidate_pending: ${{ steps.pipeline.outputs.candidate_pending }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+
+      - name: Fetch dataset
+        run: |
+          mkdir -p data/raw && cd data/raw
+          curl -sSL -o ds.zip "https://archive.ics.uci.edu/static/public/224/gas+sensor+array+drift+dataset.zip"
+          unzip -q ds.zip && mv Dataset/*.dat . && rm -rf Dataset ds.zip
+
+      - name: Evaluate control charts and register a candidate if rejected
+        id: pipeline
+        env:
+          MLFLOW_TRACKING_URI: ${{ vars.MLFLOW_TRACKING_URI || 'sqlite:///mlflow.db' }}
+        run: |
+          set +e
+          uv run python -m drift.pipeline --batch "${{ inputs.batch || 7 }}" | tee pipeline.log
+          code=${PIPESTATUS[0]}
+          set -e
+          if [ "$code" = "10" ]; then
+            echo "candidate_pending=true" >> "$GITHUB_OUTPUT"
+          elif [ "$code" != "0" ]; then
+            exit "$code"
+          fi
+          {
+            echo "### Drift check — batch ${{ inputs.batch || 7 }}"
+            echo
+            echo '```'
+            cat pipeline.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: drift-run
+          path: |
+            pipeline.log
+            artifacts/

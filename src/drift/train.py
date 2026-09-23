@@ -15,6 +15,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 
+from drift.constants import MODEL_NAME, PENDING
 from drift.data import RAW_DIR, feature_columns, load_batch
 from drift.reference import (
     BASELINE_STATS_PATH,
@@ -23,7 +24,6 @@ from drift.reference import (
     write_reference_stats,
 )
 
-MODEL_NAME: Final = "calibration-drift-classifier"
 EXPERIMENT_NAME: Final = "baseline"
 REFERENCE_BATCH: Final = 1
 DEFAULT_TRACKING_URI: Final = "sqlite:///mlflow.db"
@@ -90,10 +90,13 @@ def log_run(
             registered_model_name=MODEL_NAME,
             skops_trusted_types=SKOPS_TRUSTED_TYPES,
         )
-    version = info.registered_model_version
+    version = str(info.registered_model_version)
     client = mlflow.MlflowClient()
     client.set_model_version_tag(MODEL_NAME, version, "dataset_sha256", dataset_sha256)
-    client.set_model_version_tag(MODEL_NAME, version, "approval_status", "baseline")
+    # The first model is a change to a measurement system too: it enters the gate
+    # pending like every candidate and is promoted by a human (ADR-0004).
+    client.set_model_version_tag(MODEL_NAME, version, "approval_status", PENDING)
+    client.set_model_version_tag(MODEL_NAME, version, "trigger", "initial baseline on batch 1")
     return run.info.run_id, version
 
 

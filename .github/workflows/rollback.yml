@@ -1,0 +1,32 @@
+name: rollback
+
+# Restore the previously approved model version. Also gated on the
+# production environment: a rollback is a change to a measurement system
+# and is recorded the same way as a promotion.
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: Why production is being rolled back
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - env:
+          MLFLOW_TRACKING_URI: ${{ vars.MLFLOW_TRACKING_URI || 'sqlite:///mlflow.db' }}
+          DRIFT_ACTOR: ${{ github.actor }}
+        run: |
+          uv run python -m drift.cli rollback --reason "${{ inputs.reason }}"
+          uv run python -m drift.cli status | tee -a "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,47 @@
+name: promote
+
+# The approval gate (ADR-0004). The `production` environment carries a
+# required-reviewer protection rule, so this job pauses until a named human
+# approves it in GitHub. The approver's username is recorded on the model
+# version as `approved_by` — the deployment record and the registry agree.
+#
+# Setup (once): Settings > Environments > New environment "production" >
+# Required reviewers. Without that rule this workflow is NOT a gate.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Model version to promote
+        required: true
+      reason:
+        description: Why this candidate is fit to promote
+        required: true
+      action:
+        description: promote or reject
+        type: choice
+        options: [promote, reject]
+        default: promote
+
+permissions:
+  contents: read
+
+jobs:
+  approve:
+    runs-on: ubuntu-latest
+    environment: production   # <- the gate; requires a reviewer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+
+      - name: Record the decision against the model version
+        env:
+          MLFLOW_TRACKING_URI: ${{ vars.MLFLOW_TRACKING_URI || 'sqlite:///mlflow.db' }}
+          DRIFT_ACTOR: ${{ github.actor }}
+        run: |
+          uv run python -m drift.cli "${{ inputs.action == 'promote' && 'approve' || 'reject' }}" \
+            "${{ inputs.version }}" --reason "${{ inputs.reason }}"
+          uv run python -m drift.cli status | tee -a "$GITHUB_STEP_SUMMARY"

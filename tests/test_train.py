@@ -69,7 +69,7 @@ def test_log_run_registers_model_with_dataset_hash(
     mv = mlflow.MlflowClient().get_model_version(MODEL_NAME, version)
     assert mv.run_id == run_id
     assert mv.tags["dataset_sha256"] == "cafe"
-    assert mv.tags["approval_status"] == "baseline"
+    assert mv.tags["approval_status"] == "pending-approval"  # even v1 needs a human
 
 
 def test_log_run_rejects_empty_metrics(synthetic_batch: pd.DataFrame, tmp_path: Path) -> None:
