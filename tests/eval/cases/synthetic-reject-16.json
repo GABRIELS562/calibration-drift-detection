@@ -1,0 +1,140 @@
+{
+  "id": "synthetic-reject-16",
+  "input": {
+    "batch": 95,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [
+      {
+        "sensor": "s01",
+        "analyte": "toluene",
+        "z": -3.3,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s02",
+        "analyte": "toluene",
+        "z": -3.4,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s03",
+        "analyte": "toluene",
+        "z": -3.5,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s04",
+        "analyte": "toluene",
+        "z": -3.6,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s05",
+        "analyte": "toluene",
+        "z": -3.7,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s06",
+        "analyte": "toluene",
+        "z": -3.8,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s07",
+        "analyte": "toluene",
+        "z": -3.9,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s08",
+        "analyte": "toluene",
+        "z": -4.0,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s09",
+        "analyte": "toluene",
+        "z": -4.1,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s10",
+        "analyte": "toluene",
+        "z": -4.2,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s11",
+        "analyte": "toluene",
+        "z": -4.3,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s12",
+        "analyte": "toluene",
+        "z": -4.4,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s13",
+        "analyte": "toluene",
+        "z": -4.5,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s14",
+        "analyte": "toluene",
+        "z": -4.6,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s15",
+        "analyte": "toluene",
+        "z": -4.7,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s16",
+        "analyte": "toluene",
+        "z": -4.8,
+        "rules": [
+          "1_3s"
+        ]
+      }
+    ],
+    "warned": []
+  }
+}

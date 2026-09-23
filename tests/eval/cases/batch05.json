@@ -1,0 +1,44 @@
+{
+  "id": "batch05",
+  "input": {
+    "batch": 5,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [],
+    "warned": [
+      {
+        "sensor": "s01",
+        "analyte": "acetaldehyde",
+        "z": -1.54,
+        "rules": [
+          "4_1s"
+        ]
+      },
+      {
+        "sensor": "s02",
+        "analyte": "acetaldehyde",
+        "z": -1.54,
+        "rules": [
+          "4_1s"
+        ]
+      },
+      {
+        "sensor": "s09",
+        "analyte": "acetaldehyde",
+        "z": -1.66,
+        "rules": [
+          "4_1s"
+        ]
+      },
+      {
+        "sensor": "s10",
+        "analyte": "acetaldehyde",
+        "z": -1.78,
+        "rules": [
+          "4_1s"
+        ]
+      }
+    ]
+  }
+}

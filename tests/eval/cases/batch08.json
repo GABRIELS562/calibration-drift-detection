@@ -1,0 +1,55 @@
+{
+  "id": "batch08",
+  "input": {
+    "batch": 8,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [
+      {
+        "sensor": "s01",
+        "analyte": "toluene",
+        "z": -3.26,
+        "rules": [
+          "1_3s",
+          "2_2s"
+        ]
+      },
+      {
+        "sensor": "s02",
+        "analyte": "toluene",
+        "z": -2.96,
+        "rules": [
+          "2_2s"
+        ]
+      },
+      {
+        "sensor": "s09",
+        "analyte": "toluene",
+        "z": -2.95,
+        "rules": [
+          "2_2s"
+        ]
+      },
+      {
+        "sensor": "s10",
+        "analyte": "toluene",
+        "z": -3.31,
+        "rules": [
+          "1_3s",
+          "2_2s"
+        ]
+      }
+    ],
+    "warned": [
+      {
+        "sensor": "s06",
+        "analyte": "ammonia",
+        "z": -1.46,
+        "rules": [
+          "4_1s"
+        ]
+      }
+    ]
+  }
+}

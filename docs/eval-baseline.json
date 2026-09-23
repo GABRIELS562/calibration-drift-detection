@@ -1,0 +1,44 @@
+{
+  "prompt_version": 1,
+  "n_cases": 33,
+  "scorers": {
+    "distinguishes_warnings": {
+      "passed": 33,
+      "total": 33,
+      "rate": 1.0
+    },
+    "is_not_empty": {
+      "passed": 33,
+      "total": 33,
+      "rate": 1.0
+    },
+    "names_every_analyte": {
+      "passed": 33,
+      "total": 33,
+      "rate": 1.0
+    },
+    "names_every_rejected_sensor": {
+      "passed": 33,
+      "total": 33,
+      "rate": 1.0
+    },
+    "no_recommendation_language": {
+      "passed": 33,
+      "total": 33,
+      "rate": 1.0
+    },
+    "states_in_control_when_clean": {
+      "passed": 33,
+      "total": 33,
+      "rate": 1.0
+    },
+    "within_word_limit": {
+      "passed": 33,
+      "total": 33,
+      "rate": 1.0
+    }
+  },
+  "judge_median": null,
+  "failing_cases": [],
+  "generator": "fallback"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "batch03",
+  "input": {
+    "batch": 3,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [],
+    "warned": []
+  }
+}

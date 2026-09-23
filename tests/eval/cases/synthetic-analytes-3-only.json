@@ -1,0 +1,44 @@
+{
+  "id": "synthetic-analytes-3-only",
+  "input": {
+    "batch": 102,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [
+      {
+        "sensor": "s01",
+        "analyte": "ethylene",
+        "z": -3.5,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s02",
+        "analyte": "ammonia",
+        "z": -3.5,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s03",
+        "analyte": "ethanol",
+        "z": -3.5,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s04",
+        "analyte": "ethylene",
+        "z": -3.5,
+        "rules": [
+          "1_3s"
+        ]
+      }
+    ],
+    "warned": []
+  }
+}

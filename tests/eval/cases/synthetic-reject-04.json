@@ -1,0 +1,44 @@
+{
+  "id": "synthetic-reject-04",
+  "input": {
+    "batch": 93,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [
+      {
+        "sensor": "s01",
+        "analyte": "toluene",
+        "z": -3.3,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s02",
+        "analyte": "toluene",
+        "z": -3.4,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s03",
+        "analyte": "toluene",
+        "z": -3.5,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s04",
+        "analyte": "toluene",
+        "z": -3.6,
+        "rules": [
+          "1_3s"
+        ]
+      }
+    ],
+    "warned": []
+  }
+}

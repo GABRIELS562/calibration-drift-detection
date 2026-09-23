@@ -1,0 +1,20 @@
+{
+  "id": "synthetic-z-positive",
+  "input": {
+    "batch": 109,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [
+      {
+        "sensor": "s13",
+        "analyte": "acetone",
+        "z": 3.02,
+        "rules": [
+          "1_3s"
+        ]
+      }
+    ],
+    "warned": []
+  }
+}

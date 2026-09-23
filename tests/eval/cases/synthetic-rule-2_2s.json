@@ -1,0 +1,20 @@
+{
+  "id": "synthetic-rule-2_2s",
+  "input": {
+    "batch": 97,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [
+      {
+        "sensor": "s05",
+        "analyte": "ammonia",
+        "z": -3.4,
+        "rules": [
+          "2_2s"
+        ]
+      }
+    ],
+    "warned": []
+  }
+}

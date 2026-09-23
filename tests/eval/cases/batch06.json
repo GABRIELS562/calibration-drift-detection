@@ -1,0 +1,85 @@
+{
+  "id": "batch06",
+  "input": {
+    "batch": 6,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [
+      {
+        "sensor": "s07",
+        "analyte": "toluene",
+        "z": 3.24,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s08",
+        "analyte": "toluene",
+        "z": 3.9,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s15",
+        "analyte": "toluene",
+        "z": 3.78,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s16",
+        "analyte": "toluene",
+        "z": 3.41,
+        "rules": [
+          "1_3s"
+        ]
+      }
+    ],
+    "warned": [
+      {
+        "sensor": "s01",
+        "analyte": "acetone",
+        "z": -1.79,
+        "rules": [
+          "4_1s"
+        ]
+      },
+      {
+        "sensor": "s02",
+        "analyte": "acetone",
+        "z": -1.86,
+        "rules": [
+          "4_1s"
+        ]
+      },
+      {
+        "sensor": "s06",
+        "analyte": "ammonia",
+        "z": -1.31,
+        "rules": [
+          "4_1s"
+        ]
+      },
+      {
+        "sensor": "s09",
+        "analyte": "acetone",
+        "z": -2.04,
+        "rules": [
+          "4_1s"
+        ]
+      },
+      {
+        "sensor": "s10",
+        "analyte": "acetone",
+        "z": -2.15,
+        "rules": [
+          "4_1s"
+        ]
+      }
+    ]
+  }
+}

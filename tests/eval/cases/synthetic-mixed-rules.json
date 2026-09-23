@@ -1,0 +1,45 @@
+{
+  "id": "synthetic-mixed-rules",
+  "input": {
+    "batch": 106,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [
+      {
+        "sensor": "s01",
+        "analyte": "toluene",
+        "z": 4.2,
+        "rules": [
+          "1_3s"
+        ]
+      },
+      {
+        "sensor": "s02",
+        "analyte": "ethylene",
+        "z": -2.4,
+        "rules": [
+          "2_2s"
+        ]
+      }
+    ],
+    "warned": [
+      {
+        "sensor": "s03",
+        "analyte": "ammonia",
+        "z": 1.4,
+        "rules": [
+          "4_1s"
+        ]
+      },
+      {
+        "sensor": "s04",
+        "analyte": "acetaldehyde",
+        "z": 0.3,
+        "rules": [
+          "10x"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "synthetic-reject-01",
+  "input": {
+    "batch": 91,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [
+      {
+        "sensor": "s01",
+        "analyte": "toluene",
+        "z": -3.3,
+        "rules": [
+          "1_3s"
+        ]
+      }
+    ],
+    "warned": []
+  }
+}

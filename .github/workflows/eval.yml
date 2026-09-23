@@ -1,0 +1,56 @@
+name: eval
+
+# Gates changes to the drift summariser's prompt. The prompt is part of the
+# validated system (ADR-0004 reasoning applied to a non-deterministic
+# component): version control records that it changed, this records whether
+# the change made the output worse.
+#
+# The deterministic scorers run on every PR with no credentials — they score
+# the template fallback, which is the path that runs in production when the
+# API is unavailable. The live model and the readability judge run only when
+# ANTHROPIC_API_KEY is configured as a repository secret.
+
+on:
+  pull_request:
+    paths:
+      - "src/drift/prompts/**"
+      - "src/drift/summarise.py"
+      - "src/drift/eval/**"
+      - "tests/eval/**"
+      - "docs/eval-baseline.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Score against the committed baseline
+        run: uv run python -m drift.eval.run_eval | tee -a "$GITHUB_STEP_SUMMARY"
+
+  live:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Score the model, with the readability judge
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "No ANTHROPIC_API_KEY configured — skipping the live eval." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          uv run python -m drift.eval.run_eval --live --judge | tee -a "$GITHUB_STEP_SUMMARY"

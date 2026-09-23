@@ -1,0 +1,20 @@
+{
+  "id": "synthetic-warnonly-01",
+  "input": {
+    "batch": 110,
+    "reference_batch": 1,
+    "n_sensors": 16,
+    "control_feature": "f1",
+    "rejected": [],
+    "warned": [
+      {
+        "sensor": "s01",
+        "analyte": "acetaldehyde",
+        "z": -1.5,
+        "rules": [
+          "4_1s"
+        ]
+      }
+    ]
+  }
+}
