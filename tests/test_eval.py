@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 
 import pytest
+from conftest import requires_dataset
 
 from drift.eval.generate_cases import build_cases, load_cases
 from drift.eval.run_eval import JUDGE_FLOOR, compare, generate, run, summarise_scores
@@ -217,5 +218,6 @@ def test_generate_uses_the_model_when_a_client_is_given(fake_client) -> None:
     assert text.startswith("Sensor s01")
 
 
+@requires_dataset
 def test_build_cases_is_deterministic() -> None:
     assert [c["id"] for c in build_cases()] == [c["id"] for c in build_cases()]

@@ -57,3 +57,19 @@ def fake_client_factory():
 @pytest.fixture
 def fake_client(fake_client_factory):
     return fake_client_factory()
+
+
+def dataset_available() -> bool:
+    """The UCI dataset is gitignored, so it is absent in CI.
+
+    Tests that need the real batches skip rather than fail; everything else
+    runs on synthetic fixtures or committed files.
+    """
+    from drift.data import RAW_DIR
+
+    return (RAW_DIR / "batch1.dat").is_file()
+
+
+requires_dataset = pytest.mark.skipif(
+    not dataset_available(), reason="UCI dataset not present (gitignored); see README"
+)
