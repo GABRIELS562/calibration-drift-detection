@@ -15,6 +15,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 
+from drift.audit import AUDIT_LOG_PATH, append_event
 from drift.constants import MODEL_NAME, PENDING
 from drift.data import RAW_DIR, feature_columns, load_batch
 from drift.reference import (
@@ -97,6 +98,17 @@ def log_run(
     # pending like every candidate and is promoted by a human (ADR-0004).
     client.set_model_version_tag(MODEL_NAME, version, "approval_status", PENDING)
     client.set_model_version_tag(MODEL_NAME, version, "trigger", "initial baseline on batch 1")
+    append_event(
+        AUDIT_LOG_PATH,
+        action="baseline_registered",
+        actor="train",
+        details={
+            "version": version,
+            "source": source,
+            "dataset_sha256": dataset_sha256,
+            "metrics": metrics,
+        },
+    )
     return run.info.run_id, version
 
 

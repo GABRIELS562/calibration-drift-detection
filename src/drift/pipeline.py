@@ -14,6 +14,7 @@ from typing import Final
 
 import mlflow
 
+from drift.audit import AUDIT_LOG_PATH, append_event
 from drift.data import N_BATCHES, RAW_DIR, load_batch
 from drift.reference import sha256_of_file
 from drift.retrain import should_retrain, train_candidate_for_batch
@@ -31,6 +32,18 @@ def run(batch: int) -> int:
 
     result = evaluate_batch(limits, history, current, reference_batch=REFERENCE_BATCH)
     decision = should_retrain(result)
+    append_event(
+        AUDIT_LOG_PATH,
+        action="drift_evaluated",
+        actor="pipeline",
+        details={
+            "batch": batch,
+            "rejected_sensors": list(result.rejected_sensors),
+            "warned_sensors": list(result.warned_sensors),
+            "triggered": decision.triggered,
+            "reason": decision.reason,
+        },
+    )
     print(decision.reason)
     if not decision.triggered:
         return 0

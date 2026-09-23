@@ -15,6 +15,7 @@ import mlflow.sklearn
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
+from drift.audit import AUDIT_LOG_PATH, append_event
 from drift.constants import (
     APPROVED,
     MODEL_NAME,
@@ -39,6 +40,11 @@ def _client() -> mlflow.MlflowClient:
 
 def _now() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+def _audit(action: str, actor: str, **details: Any) -> None:
+    """Append to the tamper-evident log. Module-level path so tests can redirect it."""
+    append_event(AUDIT_LOG_PATH, action=action, actor=actor, details=details)
 
 
 NO_INCUMBENT: Final = "no incumbent in production — nothing to compare against"
@@ -106,6 +112,16 @@ def register_candidate(
     }
     for key, value in tags.items():
         _client().set_model_version_tag(MODEL_NAME, version, key, value)
+    _audit(
+        "candidate_registered",
+        "pipeline",
+        version=version,
+        trigger=trigger,
+        comparison=comparison,
+        regression=regression,
+        dataset_sha256=dataset_sha256,
+        metrics=metrics,
+    )
     return version
 
 
@@ -135,6 +151,7 @@ def approve(version: str, *, actor: str, reason: str) -> str:
     }.items():
         client.set_model_version_tag(MODEL_NAME, version, key, value)
     client.set_registered_model_alias(MODEL_NAME, PRODUCTION_ALIAS, version)
+    _audit("approved", actor, version=version, reason=reason)
     return version
 
 
@@ -150,6 +167,7 @@ def reject(version: str, *, actor: str, reason: str) -> str:
         "rejected_at": _now(),
     }.items():
         client.set_model_version_tag(MODEL_NAME, version, key, value)
+    _audit("rejected", actor, version=version, reason=reason)
     return version
 
 
@@ -193,6 +211,13 @@ def rollback(*, actor: str, reason: str) -> str:
     }.items():
         client.set_model_version_tag(MODEL_NAME, current, key, value)
     client.set_registered_model_alias(MODEL_NAME, PRODUCTION_ALIAS, previous)
+    _audit(
+        "rolled_back",
+        actor,
+        displaced_version=current,
+        restored_version=previous,
+        reason=reason,
+    )
     return previous
 
 

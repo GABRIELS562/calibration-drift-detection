@@ -72,6 +72,34 @@ def test_log_run_registers_model_with_dataset_hash(
     assert mv.tags["approval_status"] == "pending-approval"  # even v1 needs a human
 
 
+def test_log_run_writes_a_baseline_registration_to_the_audit_log(
+    synthetic_batch: pd.DataFrame, tmp_path: Path, monkeypatch
+) -> None:
+    from drift import train as train_module
+    from drift.audit import read_events, verify_chain
+
+    log = tmp_path / "audit.jsonl"
+    monkeypatch.setattr(train_module, "AUDIT_LOG_PATH", log)
+    mlflow.set_tracking_uri(f"sqlite:///{tmp_path / 'mlflow.db'}")
+    x, y = split_features_labels(synthetic_batch)
+    model = fit_baseline(x, y, seed=1)
+
+    _, version = log_run(
+        model,
+        metrics={"accuracy": 1.0, "f1_macro": 1.0},
+        params={"seed": 1},
+        dataset_sha256="cafe",
+        source="batch1.dat",
+        example=x.head(2),
+    )
+
+    events = read_events(log)
+    assert [e.action for e in events] == ["baseline_registered"]
+    assert events[0].details["version"] == version
+    assert events[0].details["dataset_sha256"] == "cafe"
+    assert verify_chain(log) == 1
+
+
 def test_log_run_rejects_empty_metrics(synthetic_batch: pd.DataFrame, tmp_path: Path) -> None:
     mlflow.set_tracking_uri(f"sqlite:///{tmp_path / 'mlflow.db'}")
     x, y = split_features_labels(synthetic_batch)

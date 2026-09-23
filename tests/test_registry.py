@@ -195,3 +195,39 @@ def test_audit_trail_is_chronological_and_complete(registry) -> None:
     assert trail[1]["approval_status"] == REJECTED
     assert trail[1]["rejection_reason"] == "regression"
     assert all("trigger" in e for e in trail)
+
+
+# --- audit log integration ---
+
+
+def test_registry_actions_are_written_to_the_audit_log(registry, tmp_path, monkeypatch) -> None:
+    from drift import registry as reg
+    from drift.audit import read_events, verify_chain
+
+    log = tmp_path / "audit.jsonl"
+    monkeypatch.setattr(reg, "AUDIT_LOG_PATH", log)
+    model, x = registry
+
+    v1 = _register(model, x)
+    approve(v1, actor="a@lab", reason="first")
+    v2 = _register(model, x, metrics={"accuracy": 0.1, "f1_macro": 0.1})
+    reject(v2, actor="b@lab", reason="regression")
+    v3 = _register(model, x)
+    approve(v3, actor="a@lab", reason="third")
+    rollback(actor="c@lab", reason="bad in service")
+
+    events = read_events(log)
+    assert [e.action for e in events] == [
+        "candidate_registered",
+        "approved",
+        "candidate_registered",
+        "rejected",
+        "candidate_registered",
+        "approved",
+        "rolled_back",
+    ]
+    assert [e.actor for e in events][1::2][:3] == ["a@lab", "b@lab", "a@lab"]
+    assert events[1].details["version"] == v1
+    assert events[3].details["reason"] == "regression"
+    assert events[-1].details["restored_version"] == v1
+    assert verify_chain(log) == 7
