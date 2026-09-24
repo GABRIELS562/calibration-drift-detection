@@ -51,6 +51,11 @@ spec:
             - --serve-artifacts
             - --artifacts-destination=/mlflow/artifacts
             - --allowed-hosts={{ .Values.mlflow.allowedHosts }}
+            # One worker: the backend is a single SQLite file, and MLflow's
+            # default of four workers gives concurrent writers on it, which
+            # fails registry writes. Postgres is the answer at real volume —
+            # see the limitation note in the deployment docs.
+            - --workers={{ .Values.mlflow.workers }}
           ports:
             - name: http
               containerPort: {{ .Values.mlflow.port }}
