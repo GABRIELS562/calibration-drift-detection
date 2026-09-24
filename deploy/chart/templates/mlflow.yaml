@@ -67,12 +67,18 @@ spec:
             httpGet:
               path: /health
               port: http
+              httpHeaders:
+                - name: Host
+                  value: "localhost:{{ .Values.mlflow.port }}"
             initialDelaySeconds: 30
             periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /health
               port: http
+              httpHeaders:
+                - name: Host
+                  value: "localhost:{{ .Values.mlflow.port }}"
             initialDelaySeconds: 10
             periodSeconds: 10
           resources: {{- toYaml .Values.mlflowResources | nindent 12 }}
