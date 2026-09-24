@@ -15,7 +15,11 @@ service:
 # stateful by design and must not be horizontally scaled behind SQLite.
 mlflow:
   enabled: true
-  image: ghcr.io/mlflow/mlflow:v3.6.0
+  # Pinned to the same version as the client in uv.lock. Skew between the
+  # process that trains and the registry that records it is a traceability
+  # hazard, not just a compatibility one: a request the server misreads is a
+  # record that does not match what was run.
+  image: ghcr.io/mlflow/mlflow:v3.16.1
   port: 5000
   storage: 5Gi
   nodePort: 30500
