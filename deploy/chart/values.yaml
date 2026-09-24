@@ -74,3 +74,19 @@ containerSecurityContext:
   readOnlyRootFilesystem: true
   capabilities:
     drop: ["ALL"]
+
+# In-cluster drift evaluation. Writes the Westgard verdict to a volume the
+# API reads, so /drift-status and the drift gauges reflect real evaluations.
+evaluate:
+  enabled: true
+  schedule: "0 6 * * 1"
+  storage: 2Gi
+  datasetUrl: "https://archive.ics.uci.edu/static/public/224/gas+sensor+array+drift+dataset.zip"
+
+evaluateResources:
+  requests:
+    cpu: 200m
+    memory: 1Gi
+  limits:
+    cpu: "2"
+    memory: 4Gi

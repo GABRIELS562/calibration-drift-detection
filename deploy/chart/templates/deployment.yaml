@@ -54,6 +54,17 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            {{- if .Values.evaluate.enabled }}
+            # Read-only: the API reports verdicts, it never writes them.
+            - name: artifacts
+              mountPath: /app/artifacts
+              readOnly: true
+            {{- end }}
       volumes:
         - name: tmp
           emptyDir: {}
+        {{- if .Values.evaluate.enabled }}
+        - name: artifacts
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-artifacts
+        {{- end }}

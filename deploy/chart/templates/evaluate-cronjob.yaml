@@ -1,0 +1,87 @@
+{{- if .Values.evaluate.enabled }}
+# The drift evaluation runs in the cluster and writes its verdict to a
+# volume the API reads. Without this the API has no verdict to report and
+# the drift gauges sit at zero regardless of what the instrument is doing.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-artifacts
+  labels: {{- include "calibration-drift.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.evaluate.storage }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-evaluate
+  labels: {{- include "calibration-drift.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.evaluate.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: Never
+          securityContext: {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          containers:
+            - name: evaluate
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              securityContext: {{- toYaml .Values.containerSecurityContext | nindent 16 }}
+              env:
+                - name: MLFLOW_TRACKING_URI
+                  value: {{ include "calibration-drift.mlflowUrl" . | quote }}
+                - name: MLFLOW_DISABLE_AGENT_HINT
+                  value: "1"
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -eu
+                  # The dataset is not redistributed in the image (ADR-0002),
+                  # so each run fetches it into a scratch volume.
+                  if [ ! -f /app/data/raw/batch1.dat ]; then
+                    echo "fetching dataset"
+                    cd /app/data/raw
+                    python -c "
+                  import urllib.request, zipfile, io, shutil, pathlib
+                  url='{{ .Values.evaluate.datasetUrl }}'
+                  with urllib.request.urlopen(url, timeout=300) as r:
+                      z = zipfile.ZipFile(io.BytesIO(r.read()))
+                  for n in z.namelist():
+                      if n.endswith('.dat'):
+                          with z.open(n) as s, open(pathlib.Path(n).name, 'wb') as d:
+                              shutil.copyfileobj(s, d)
+                  print('dataset ready')
+                  "
+                  fi
+                  cd /app
+                  python -m drift.run_westgard
+              resources: {{- toYaml .Values.evaluateResources | nindent 16 }}
+              volumeMounts:
+                - name: artifacts
+                  mountPath: /app/artifacts
+                - name: raw
+                  mountPath: /app/data/raw
+                - name: docs
+                  mountPath: /app/docs
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: artifacts
+              persistentVolumeClaim:
+                claimName: {{ .Release.Name }}-artifacts
+            - name: raw
+              emptyDir:
+                sizeLimit: 1Gi
+            - name: docs
+              emptyDir: {}
+            - name: tmp
+              emptyDir: {}
+{{- end }}
