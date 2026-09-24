@@ -1,0 +1,67 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    {{- include "calibration-drift.labels" . | nindent 4 }}
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: calibration-drift
+      rules:
+        # A rejected sensor is an out-of-control condition under the Westgard
+        # rules (ADR-0003). It pages because results may already have been
+        # produced by an instrument that is out of tolerance.
+        - alert: SensorRejected
+          expr: drift_sensors_rejected > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "{{`{{ $value }}`}} sensor(s) rejected by the control rules"
+            description: >-
+              A control rule (1_3s or 2_2s) fired. A retraining candidate has
+              been registered and is pending approval; nothing has been
+              deployed.
+
+        # Warnings are early signals, not failures — they open an
+        # investigation rather than stopping work.
+        - alert: SensorWarning
+          expr: drift_sensors_warned > 0
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{`{{ $value }}`}} sensor(s) under a control-chart warning"
+            description: "A trend rule (4_1s or 10x) fired. Investigate; no action is forced."
+
+        # A candidate waiting on a human is expected. A candidate waiting a
+        # long time is approval fatigue, which is the failure mode the gate
+        # is most vulnerable to (ADR-0004).
+        - alert: CandidateAwaitingApprovalTooLong
+          expr: drift_candidates_pending > 0
+          for: 24h
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{`{{ $value }}`}} model candidate(s) pending approval for over 24h"
+            description: "Promotion requires a human decision. Nothing is deployed until one is made."
+
+        - alert: NoApprovedModelServed
+          expr: drift_model_ready == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "The service has no approved model loaded"
+            description: "Readiness is false: predictions are refused with 503."
+
+        - alert: DriftServiceDown
+          expr: up{job="calibration-drift"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "The drift service is not being scraped"
+{{- end }}

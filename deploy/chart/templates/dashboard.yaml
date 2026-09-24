@@ -1,0 +1,15 @@
+{{- if .Values.serviceMonitor.enabled }}
+# The dashboard is a chart resource, so it is version-controlled and Argo CD
+# owns it: an edit made in the Grafana UI is reverted on the next sync. The
+# kube-prometheus-stack sidecar imports any ConfigMap carrying this label.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-dashboard
+  labels:
+    {{- include "calibration-drift.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  calibration-drift.json: |
+{{ .Files.Get "dashboards/calibration-drift.json" | indent 4 }}
+{{- end }}
