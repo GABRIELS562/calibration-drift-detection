@@ -36,9 +36,10 @@ mlflowResources:
     cpu: "1"
     memory: 1Gi
 
-# Prometheus Operator ServiceMonitor. Off until kube-prometheus-stack is present.
+# Prometheus Operator ServiceMonitor. kube-prometheus-stack is installed on
+# the cluster, so scraping is on.
 serviceMonitor:
-  enabled: false
+  enabled: true
   interval: 30s
 
 networkPolicy:
