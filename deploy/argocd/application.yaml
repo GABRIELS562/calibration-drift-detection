@@ -1,0 +1,42 @@
+# Argo CD pulls the chart from git and reconciles the cluster to it. The
+# deployed state is therefore whatever is committed here — a cluster change
+# made by hand is reverted, which is the property that makes the repository
+# the record of what is running.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: calibration-drift
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/GABRIELS562/calibration-drift-detection.git
+    targetRevision: main
+    path: deploy/chart
+    helm:
+      valueFiles:
+        - values.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: calibration-drift
+
+  syncPolicy:
+    automated:
+      # Self-heal reverts drift in the cluster. Prune removes resources that
+      # have left git. Neither promotes a model: promotion is the approval
+      # gate in the registry (ADR-0004), and Argo CD has no view of it.
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m

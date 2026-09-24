@@ -1,0 +1,59 @@
+image:
+  repository: ghcr.io/gabriels562/calibration-drift-detection
+  tag: main
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+service:
+  type: NodePort
+  port: 8000
+  nodePort: 30800
+
+# MLflow holds the model registry and therefore the approval state.
+# Single replica with a PVC: the registry is the audit backbone, so it is
+# stateful by design and must not be horizontally scaled behind SQLite.
+mlflow:
+  enabled: true
+  image: ghcr.io/mlflow/mlflow:v3.6.0
+  port: 5000
+  storage: 5Gi
+  nodePort: 30500
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: "2"
+    memory: 2Gi
+
+mlflowResources:
+  requests:
+    cpu: 50m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+# Prometheus Operator ServiceMonitor. Off until kube-prometheus-stack is present.
+serviceMonitor:
+  enabled: false
+  interval: 30s
+
+networkPolicy:
+  enabled: true
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
