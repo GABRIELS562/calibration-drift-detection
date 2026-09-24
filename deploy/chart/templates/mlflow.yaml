@@ -50,6 +50,7 @@ spec:
             # local --default-artifact-root tries to write it on its own disk.
             - --serve-artifacts
             - --artifacts-destination=/mlflow/artifacts
+            - --allowed-hosts={{ .Values.mlflow.allowedHosts }}
           ports:
             - name: http
               containerPort: {{ .Values.mlflow.port }}

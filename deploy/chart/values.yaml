@@ -19,6 +19,11 @@ mlflow:
   port: 5000
   storage: 5Gi
   nodePort: 30500
+  # MLflow 3 rejects unrecognised Host headers (DNS-rebinding protection).
+  # Its default allowlist is localhost plus RFC1918, and Tailscale addresses
+  # are CGNAT (100.64.0.0/10), so the node's Tailscale address is named
+  # explicitly. Widen this list deliberately; do not use --disable-security.
+  allowedHosts: "localhost:30500,127.0.0.1:30500,100.89.153.112:30500,calibration-drift-mlflow:5000,calibration-drift-mlflow.calibration-drift.svc.cluster.local:5000"
 
 resources:
   requests:
