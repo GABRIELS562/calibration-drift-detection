@@ -74,6 +74,13 @@ uv run python -c "
 from drift.audit import AUDIT_LOG_PATH, verify_chain
 print(verify_chain(AUDIT_LOG_PATH), 'entries verified')"
 ```
+
+The live log at `audit/audit.jsonl` is runtime state and is not committed,
+for the same reason `mlflow.db` is not: in deployment it belongs in
+write-once storage outside the repository (Phase 6), and a hash-chained file
+under version control would be broken by any merge. A clean example of a
+full trail is committed at `docs/audit-trail-example.jsonl` as evidence of
+the shape; it verifies with the same command.
 Each entry carries the hash of the entry before it. Editing, deleting or
 reordering any entry breaks the chain, and the error names the entry.
 
@@ -104,6 +111,9 @@ cannot demonstrate that the system was watching in between.
   tamper-proof: someone who can rewrite the whole file can rebuild a
   consistent chain. Anchoring it (an external timestamp, or a
   write-once/object-lock store) is the AWS-side answer in Phase 6.
+- **Nothing enforces that the writer is the only writer.** The tests are
+  prevented from touching the live log by an autouse fixture rather than by
+  a permission; a process running as the same user could append to it.
 - **The raw dataset is not committed**, by choice. Its hash is, so a
   re-download can be verified — but the bytes themselves live outside the
   repository.

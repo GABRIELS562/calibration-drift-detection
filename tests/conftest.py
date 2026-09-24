@@ -73,3 +73,18 @@ def dataset_available() -> bool:
 requires_dataset = pytest.mark.skipif(
     not dataset_available(), reason="UCI dataset not present (gitignored); see README"
 )
+
+
+@pytest.fixture(autouse=True)
+def isolate_audit_log(tmp_path, monkeypatch):
+    """No test may write to the real audit log.
+
+    ``AUDIT_LOG_PATH`` is imported into several modules, so each binding is
+    redirected. Without this, a test run appends fixture events ("a@lab",
+    dataset hash "cafe") to the production trail — which in a project whose
+    subject is audit integrity is precisely the wrong failure.
+    """
+    log = tmp_path / "audit" / "audit.jsonl"
+    for module in ("drift.audit", "drift.registry", "drift.train", "drift.pipeline"):
+        monkeypatch.setattr(f"{module}.AUDIT_LOG_PATH", log, raising=False)
+    return log

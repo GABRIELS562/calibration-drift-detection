@@ -111,3 +111,14 @@ def test_action_and_actor_are_required(log: Path) -> None:
     for kwargs in ({"action": "", "actor": "a"}, {"action": "x", "actor": " "}):
         with pytest.raises(ValueError):
             append_event(log, details={}, **kwargs)
+
+
+def test_no_test_may_write_to_the_real_audit_log(isolate_audit_log) -> None:
+    """Regression guard: the autouse fixture must redirect every binding."""
+    from drift import pipeline, registry, train
+    from drift.audit import AUDIT_LOG_PATH as module_path
+
+    bindings = (module_path, registry.AUDIT_LOG_PATH, train.AUDIT_LOG_PATH, pipeline.AUDIT_LOG_PATH)
+    for path in bindings:
+        assert path == isolate_audit_log
+        assert "calibration-drift-detection/audit/audit.jsonl" not in str(path)

@@ -11,10 +11,7 @@ from drift.train import fit_baseline, split_features_labels
 
 
 @pytest.fixture
-def version(synthetic_batch, tmp_path: Path, monkeypatch) -> str:
-    from drift import registry as reg
-
-    monkeypatch.setattr(reg, "AUDIT_LOG_PATH", tmp_path / "audit.jsonl")
+def version(synthetic_batch, tmp_path: Path) -> str:
     mlflow.set_tracking_uri(f"sqlite:///{tmp_path / 'mlflow.db'}")
     x, y = split_features_labels(synthetic_batch)
     model = fit_baseline(x, y, seed=1)

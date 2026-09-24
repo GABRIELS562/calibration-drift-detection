@@ -200,12 +200,10 @@ def test_audit_trail_is_chronological_and_complete(registry) -> None:
 # --- audit log integration ---
 
 
-def test_registry_actions_are_written_to_the_audit_log(registry, tmp_path, monkeypatch) -> None:
-    from drift import registry as reg
+def test_registry_actions_are_written_to_the_audit_log(registry, isolate_audit_log) -> None:
     from drift.audit import read_events, verify_chain
 
-    log = tmp_path / "audit.jsonl"
-    monkeypatch.setattr(reg, "AUDIT_LOG_PATH", log)
+    log = isolate_audit_log
     model, x = registry
 
     v1 = _register(model, x)

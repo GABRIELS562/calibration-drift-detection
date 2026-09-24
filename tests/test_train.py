@@ -73,13 +73,11 @@ def test_log_run_registers_model_with_dataset_hash(
 
 
 def test_log_run_writes_a_baseline_registration_to_the_audit_log(
-    synthetic_batch: pd.DataFrame, tmp_path: Path, monkeypatch
+    synthetic_batch: pd.DataFrame, tmp_path: Path, isolate_audit_log
 ) -> None:
-    from drift import train as train_module
     from drift.audit import read_events, verify_chain
 
-    log = tmp_path / "audit.jsonl"
-    monkeypatch.setattr(train_module, "AUDIT_LOG_PATH", log)
+    log = isolate_audit_log
     mlflow.set_tracking_uri(f"sqlite:///{tmp_path / 'mlflow.db'}")
     x, y = split_features_labels(synthetic_batch)
     model = fit_baseline(x, y, seed=1)
