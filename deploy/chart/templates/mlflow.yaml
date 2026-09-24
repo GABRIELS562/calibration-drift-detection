@@ -45,7 +45,11 @@ spec:
             - --host=0.0.0.0
             - --port={{ .Values.mlflow.port }}
             - --backend-store-uri=sqlite:////mlflow/mlflow.db
-            - --default-artifact-root=/mlflow/artifacts
+            # Serve artifacts through the server (mlflow-artifacts:/) rather
+            # than handing clients a filesystem path. A remote client given a
+            # local --default-artifact-root tries to write it on its own disk.
+            - --serve-artifacts
+            - --artifacts-destination=/mlflow/artifacts
           ports:
             - name: http
               containerPort: {{ .Values.mlflow.port }}
