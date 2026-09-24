@@ -23,6 +23,9 @@ mlflow:
   port: 5000
   storage: 5Gi
   nodePort: 30500
+  # Two workers: enough concurrency for probes plus a client, while keeping
+  # the memory footprint predictable on a single SQLite backend.
+  workers: 2
   # MLflow 3 rejects unrecognised Host headers (DNS-rebinding protection).
   # Its default allowlist is localhost plus RFC1918, and Tailscale addresses
   # are CGNAT (100.64.0.0/10), so the node's Tailscale address is named
@@ -39,11 +42,15 @@ resources:
 
 mlflowResources:
   requests:
-    cpu: 50m
-    memory: 256Mi
+    cpu: 100m
+    memory: 512Mi
   limits:
     cpu: "1"
-    memory: 1Gi
+    # MLflow 3.16 holds roughly 300-400 MiB per worker. At 1Gi with the
+    # default four workers it was OOMKilled during startup, which surfaced
+    # as probe timeouts and missing Service endpoints rather than as an
+    # obvious memory fault.
+    memory: 3Gi
 
 # Prometheus Operator ServiceMonitor. kube-prometheus-stack is installed on
 # the cluster, so scraping is on.

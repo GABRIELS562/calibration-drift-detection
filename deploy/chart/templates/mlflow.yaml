@@ -51,6 +51,7 @@ spec:
             - --serve-artifacts
             - --artifacts-destination=/mlflow/artifacts
             - --allowed-hosts={{ .Values.mlflow.allowedHosts }}
+            - --workers={{ .Values.mlflow.workers }}
           ports:
             - name: http
               containerPort: {{ .Values.mlflow.port }}
