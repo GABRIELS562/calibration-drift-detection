@@ -1,8 +1,15 @@
 """Model cards generated from the registry, not written by hand.
 
 A card restates what the registry already holds — provenance, metrics,
-approval state — in the form an assessor or a reviewer reads. Generating
-it means it cannot drift away from the model it describes.
+approval state — in the form an assessor or a reviewer reads. Generating it
+means it cannot be *written* wrong.
+
+It can still be *stale*: a card committed under ``docs/model-cards/`` is a
+point-in-time render, and the committed copies drifted once already when the
+registry moved from a local SQLite file to the cluster. Regenerate against
+the registry that is actually in service rather than trusting a committed
+copy — the card names its version and dataset hash so the mismatch is
+visible.
 """
 
 from pathlib import Path

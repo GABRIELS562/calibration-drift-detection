@@ -77,6 +77,13 @@ same person for the same decision, from two independent systems.
 > Without it the workflow runs unattended and this ADR describes something
 > that is not true. This is the one control in the project that a reader
 > cannot verify from the source alone, and it is stated here for that reason.
+>
+> **Configured 2026-09-26**: environment `production` exists with a
+> `required_reviewers` rule naming `GABRIELS562`. It was absent for three
+> days after this ADR was written, during which the ADR described a control
+> that did not exist — which is itself the argument for stating the
+> dependency in the first place. Verify with
+> `gh api repos/<owner>/<repo>/environments`.
 
 ## Consequences
 
